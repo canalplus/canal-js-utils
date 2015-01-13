@@ -1,4 +1,4 @@
-var { Observable } = require("rx");
+var { Observable } = require("./rx");
 
 function RequestError(url, xhr, message, reason = null) {
   this.name = "RequestError";
