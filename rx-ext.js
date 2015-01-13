@@ -1,5 +1,5 @@
 var Promise_ = require("es6-promise").Promise;
-var { Observable, config } = require("rx");
+var { Observable, config } = require("rx/dist/rx.lite.js");
 var { fromEvent, merge } = Observable;
 var _ = require("./misc");
 
