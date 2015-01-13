@@ -1,0 +1,20 @@
+{
+  "name": "canal-js-utils",
+  "version": "1.0.0",
+  "description": "Various JS utility modules used in CANAL+",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/canalplus/canal-js-utils.git"
+  },
+  "author": "CANAL+",
+  "license": "BSD",
+  "bugs": {
+    "url": "https://github.com/canalplus/canal-js-utils/issues"
+  },
+  "homepage": "https://github.com/canalplus/canal-js-utils",
+  "dependencies": {
+    "es6-promise": "^2.0.1",
+    "rx": "2.3.22"
+  }
+}
