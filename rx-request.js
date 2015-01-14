@@ -26,7 +26,7 @@ RequestError.prototype = new Error();
  */
 function request(options) {
   return Observable.create(observer => {
-    var { url, method, data, headers, format } = options;
+    var { url, method, data, headers, format, noMetadata } = options;
 
     var xhr = new XMLHttpRequest();
     xhr.open(method || "GET", url, true);
@@ -74,7 +74,12 @@ function request(options) {
           `null response with format "${format}" (error while parsing or wrong content-type)`));
       }
 
-      observer.onNext({ blob, size, duration });
+      if (noMetadata) {
+        observer.onNext(blob);
+      } else {
+        observer.onNext({ blob, size, duration });
+      }
+
       observer.onCompleted();
     }
 
