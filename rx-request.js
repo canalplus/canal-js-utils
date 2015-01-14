@@ -103,8 +103,6 @@ function request(options) {
   });
 }
 
-var request = require("canal-js-utils/rx-request");
-
 var ENTITIES_REG = /[&<>]/g;
 var ENTITIES = {
   '&': '&amp;',
