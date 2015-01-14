@@ -25,6 +25,10 @@ RequestError.prototype = new Error();
  *                 response type: "arraybuffer", "blob", "document", "json" or "text" (defaults)
  */
 function request(options) {
+  if (options.format == "rest-call-method") {
+    return restCallMethod(options);
+  }
+
   return Observable.create(observer => {
     var { url, method, data, headers, format, noMetadata } = options;
 
@@ -99,6 +103,54 @@ function request(options) {
   });
 }
 
+var request = require("canal-js-utils/rx-request");
+
+var ENTITIES_REG = /[&<>]/g;
+var ENTITIES = {
+  '&': '&amp;',
+  '<': '&lt;',
+  '>': '&gt;'
+};
+
+function escapeXml(xml) {
+  return xml
+    .toString()
+    .replace(ENTITIES_REG, tag => ENTITIES[tag]);
+}
+
+function objToXML(obj) {
+  var xml = "";
+  for (var attrName in obj) {
+    var attr = obj[attrName];
+    var inner = (typeof attr == "object")
+      ? objToXML(attr)
+      : escapeXml(attr);
+    xml += `<${attrName}>${inner}</${attrName}>`;
+  }
+  return xml;
+}
+
+var METHOD_CALL_XML = `<RestCallMethod xmlns:i="http://www.w3.org/2001/XMLSchema-instance">{payload}</RestCallMethod>`;
+
+function restCallMethod(options) {
+  options.data = METHOD_CALL_XML.replace("{payload}", objToXML(options.data));
+  options.method = "POST";
+  options.headers = { "Content-Type": "application/xml" };
+  options.format = "document";
+  return request(options)
+    .map(checkRestCallMethodResponseError);
+}
+
+function checkRestCallMethodResponseError(response) {
+  var restCallResult = response.querySelector("RestCallResult");
+  var status = +restCallResult.querySelector("Status").textContent;
+  if (status < 0)
+    throw new Error(`channels: webservice error status ${status}`);
+  else
+    return restCallResult.querySelector("Output");
+}
+
+request.escapeXml = escapeXml;
 request.RequestError = RequestError;
 
 module.exports = request;
