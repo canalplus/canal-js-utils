@@ -135,6 +135,7 @@ function restCallMethod(options) {
   options.method = "POST";
   options.headers = { "Content-Type": "application/xml" };
   options.format = "document";
+  options.noMetadata = true;
   return request(options)
     .map(checkRestCallMethodResponseError);
 }

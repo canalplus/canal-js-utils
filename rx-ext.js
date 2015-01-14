@@ -6,8 +6,10 @@ var _ = require("./misc");
 config.useNativeEvents = true;
 config.Promise = Promise_;
 
+var observableProto = Observable.prototype;
+
 if (__DEV__) {
-  Observable.prototype.log = function(ns, fn) {
+  observableProto.log = function(ns, fn) {
     if (!ns) ns = "";
     return this.do(
       x  => console.log(ns, "next",  (fn || _.identity)(x)),
@@ -16,15 +18,15 @@ if (__DEV__) {
     );
   };
 } else {
-  Observable.prototype.log = function() { return this; };
+  observableProto.log = function() { return this; };
 }
 
-Observable.prototype.each = function(onNext) {
+observableProto.each = function(onNext) {
   return this.subscribe(onNext, _.noop);
 };
 
 var simpleEquals = (a, b) => a === b;
-Observable.prototype.changes = function(keySelector) {
+observableProto.changes = function(keySelector) {
   return this.distinctUntilChanged(keySelector, simpleEquals);
 };
 
