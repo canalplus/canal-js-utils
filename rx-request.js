@@ -13,6 +13,17 @@ function RequestError(url, xhr, message, reason = null) {
 }
 RequestError.prototype = new Error();
 
+function RestCallMethodError(url, restCallStatus) {
+  this.name = "RestCallMethodError";
+  this.url = url;
+  this.restCallStatus = restCallStatus;
+  this.message = "restmethodcall: webservice error status " + restCallStatus + " (" + url + ")";
+  if (Error.captureStackTrace) {
+    Error.captureStackTrace(this, RequestError);
+  }
+}
+RestCallMethodError.prototype = new Error();
+
 /**
  * Creates an observable HTTP request.
  * The options that can be passed are:
@@ -137,19 +148,18 @@ function restCallMethod(options) {
   options.format = "document";
   options.noMetadata = true;
   return request(options)
-    .map(checkRestCallMethodResponseError);
-}
-
-function checkRestCallMethodResponseError(response) {
-  var restCallResult = response.querySelector("RestCallResult");
-  var status = +restCallResult.querySelector("Status").textContent;
-  if (status < 0)
-    throw new Error(`channels: webservice error status ${status}`);
-  else
-    return restCallResult.querySelector("Output");
+    .map((response) => {
+      var restCallResult = response.querySelector("RestCallResult");
+      var status = +restCallResult.querySelector("Status").textContent;
+      if (status < 0)
+        throw new RestCallMethodError(options.url, status);
+      else
+        return restCallResult.querySelector("Output");
+    });
 }
 
 request.escapeXml = escapeXml;
 request.RequestError = RequestError;
+request.RestCallMethodError = RestCallMethodError;
 
 module.exports = request;
