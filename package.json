@@ -1,6 +1,6 @@
 {
   "name": "canal-js-utils",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "description": "Various JS utility modules used in CANAL+",
   "main": "index.js",
   "repository": {
