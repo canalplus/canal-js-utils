@@ -154,7 +154,10 @@ function restCallMethod(options) {
       if (status < 0)
         throw new RestCallMethodError(options.url, status);
       else
-        return restCallResult.querySelector("Output");
+        return {
+          output: restCallResult.querySelector("Output"),
+          status: status,
+        };
     });
 }
 
