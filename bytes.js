@@ -21,6 +21,14 @@ function bytesToStr(bytes) {
   return String.fromCharCode.apply(null, bytes);
 }
 
+function bytesToUTF16Str(bytes) {
+  var str = "";
+  var len = bytes.length;
+  for (var i = 0; i < len; i += 2)
+    str += String.fromCharCode(bytes[i]);
+  return str;
+}
+
 function hexToBytes(str) {
   var len = str.length;
   var arr = new Uint8Array(len/2);
@@ -49,14 +57,16 @@ function concat() {
     len += (typeof arg === "number") ? arg : arg.length;
   }
   var arr = new Uint8Array(len);
-  var off; i = -1;
-  if (!off) off = 0;
+  var off = 0;
+  i = -1;
   while (++i < l) {
     arg = arguments[i];
     if (typeof arg === "number") {
       off += arg;
-    } else if (arg.length) {
-      arr.set(arg, off); off += arg.length;
+    }
+    else if (arg.length > 0) {
+      arr.set(arg, off);
+      off += arg.length;
     }
   }
   return arr;
@@ -203,7 +213,7 @@ function toBase64URL(str) {
 module.exports = {
   totalBytes,
   strToBytes,
-  bytesToStr,
+  bytesToStr, bytesToUTF16Str,
   hexToBytes,
   bytesToHex,
   concat,
