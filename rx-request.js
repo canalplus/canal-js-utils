@@ -139,6 +139,11 @@ function objToXML(obj) {
   return xml;
 }
 
+function getNodeTextContent(root, name) {
+  var item = root.querySelector(name);
+  return item && item.textContent;
+}
+
 var METHOD_CALL_XML = `<RestCallMethod xmlns:i="http://www.w3.org/2001/XMLSchema-instance">{payload}</RestCallMethod>`;
 
 function restCallMethod(options) {
@@ -164,5 +169,6 @@ function restCallMethod(options) {
 request.escapeXml = escapeXml;
 request.RequestError = RequestError;
 request.RestCallMethodError = RestCallMethodError;
+request.getNodeTextContent = getNodeTextContent;
 
 module.exports = request;
