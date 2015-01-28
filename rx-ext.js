@@ -1,7 +1,8 @@
 var Promise_ = require("es6-promise").Promise;
 var { Observable, config } = require("rx/dist/rx.lite.js");
 var { fromEvent, merge } = Observable;
-var { debounce, identity, isArray, map, noop } = require("./misc");
+var { identity, isArray, map, noop } = require("./misc");
+var debounce = require("./debounce");
 
 config.useNativeEvents = true;
 config.Promise = Promise_;
