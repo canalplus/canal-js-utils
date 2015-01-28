@@ -1,7 +1,7 @@
 var Promise_ = require("es6-promise").Promise;
 var { Observable, config } = require("rx/dist/rx.lite.js");
 var { fromEvent, merge } = Observable;
-var _ = require("./misc");
+var { debounce, identity, isArray, map, noop } = require("./misc");
 
 config.useNativeEvents = true;
 config.Promise = Promise_;
@@ -12,7 +12,7 @@ if (__DEV__) {
   observableProto.log = function(ns, fn) {
     if (!ns) ns = "";
     return this.do(
-      x  => console.log(ns, "next",  (fn || _.identity)(x)),
+      x  => console.log(ns, "next",  (fn || identity)(x)),
       e  => console.log(ns, "error", e),
       () => console.log(ns, "completed")
     );
@@ -22,7 +22,7 @@ if (__DEV__) {
 }
 
 observableProto.each = function(onNext) {
-  return this.subscribe(onNext, _.noop);
+  return this.subscribe(onNext, noop);
 };
 
 var simpleEquals = (a, b) => a === b;
@@ -30,10 +30,26 @@ observableProto.changes = function(keySelector) {
   return this.distinctUntilChanged(keySelector, simpleEquals);
 };
 
+observableProto.customDebounce = function(time, debounceOptions) {
+  var source = this;
+  return Observable.create(observer => {
+    var debounced = debounce(val => observer.onNext(val), time, debounceOptions);
+    var subscribe = source.subscribe(
+      debounced,
+      e  => observer.onError(e),
+      () => observer.onCompleted()
+    );
+    return () => {
+      debounced.dispose();
+      subscribe.dispose();
+    };
+  });
+};
+
 module.exports = {
   on(elt, evts) {
-    if (_.isArray(evts)) {
-      return merge(_.map(evts, evt => fromEvent(elt, evt)));
+    if (isArray(evts)) {
+      return merge(map(evts, evt => fromEvent(elt, evt)));
     } else {
       return fromEvent(elt, evts);
     }
