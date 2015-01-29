@@ -24,6 +24,14 @@ function RestCallMethodError(url, restCallStatus) {
 }
 RestCallMethodError.prototype = new Error();
 
+function toJSONForIE(blob) {
+  try {
+    return JSON.parse(blob);
+  } catch(e) {
+    return null;
+  }
+}
+
 /**
  * Creates an observable HTTP request.
  * The options that can be passed are:
@@ -82,6 +90,10 @@ function request(options) {
         blob = new DOMParser().parseFromString(x.responseText, "text/xml");
       } else {
         blob = x.response;
+      }
+
+      if (format == "json" && typeof blob == "string") {
+        blob = toJSONForIE(blob);
       }
 
       if (blob == null) {
