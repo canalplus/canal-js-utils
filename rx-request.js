@@ -6,7 +6,7 @@ function RequestError(url, xhr, message, reason = null) {
   this.xhr = xhr;
   this.code = xhr.status;
   this.reason = reason;
-  this.message = message + " (" + url + ")";
+  this.message = `request: ${message} (${url})`;
   if (Error.captureStackTrace) {
     Error.captureStackTrace(this, RequestError);
   }
@@ -134,7 +134,7 @@ var ENTITIES = {
 };
 
 function escapeXml(xml) {
-  return xml
+  return (xml || "")
     .toString()
     .replace(ENTITIES_REG, tag => ENTITIES[tag]);
 }

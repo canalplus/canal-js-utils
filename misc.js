@@ -139,6 +139,9 @@ function extend(dst) {
   var args = arguments;
   for (var i = 1; i < args.length; i++) {
     var src = args[i];
+    if (!isObject(src))
+      continue;
+
     var ks = keys(src);
     for (var j = 0, l = ks.length; j < l; j++) {
       dst[ks[j]] = src[ks[j]];
