@@ -159,10 +159,14 @@ function getNodeTextContent(root, name) {
 var METHOD_CALL_XML = `<RestCallMethod xmlns:i="http://www.w3.org/2001/XMLSchema-instance">{payload}</RestCallMethod>`;
 
 function restCallMethod(options) {
-  options.data = METHOD_CALL_XML.replace("{payload}", objToXML(options.data));
   options.method = "POST";
   options.headers = { "Content-Type": "application/xml" };
+  options.data = METHOD_CALL_XML.replace("{payload}", objToXML(options.data));
   options.format = "document";
+  // options.url = options.url.replace("RestPortalProvider", "JsonPortalProvider");
+  // options.headers = { "Content-Type": "application/json" };
+  // options.data = JSON.stringify(options.data);
+  // options.format = "json";
   options.noMetadata = true;
   return request(options)
     .map((response) => {
