@@ -264,7 +264,23 @@ function simpleMerge(source, dist) {
   return source;
 }
 
+function chunk(arr, size) {
+  var r = [];
+  var c = 0;
+  var i = -1;
+  var l = arr ? arr.length : 0;
+  while(++i<l) {
+    if (!r[c]) { r[c] = [arr[i]]; }
+    else {
+      if (r[c].length === size) { r[++c] = [arr[i]]; }
+      else { r[c].push(arr[i]); }
+    }
+  }
+  return r;
+}
+
 module.exports = {
+  chunk,
   compact,
   contains,
   cloneArray,
