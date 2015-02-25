@@ -32,6 +32,15 @@ function toJSONForIE(blob) {
   }
 }
 
+function getResponseHeadersList(xhr, headersList) {
+  var headers = {}, header;
+  for (var i = 0; i < headersList.length; i++) {
+    header = headersList[i];
+    headers[header] = xhr.getResponseHeader(header);
+  }
+  return headers;
+}
+
 /**
  * Creates an observable HTTP request.
  * The options that can be passed are:
@@ -49,7 +58,15 @@ function request(options) {
   }
 
   return Observable.create(observer => {
-    var { url, method, data, headers, format, noMetadata } = options;
+    var {
+      url,
+      method,
+      data,
+      headers,
+      format,
+      noMetadata,
+      responseHeaders
+    } = options;
 
     var xhr = new XMLHttpRequest();
     xhr.open(method || "GET", url, true);
@@ -101,10 +118,15 @@ function request(options) {
           `null response with format "${format}" (error while parsing or wrong content-type)`));
       }
 
+      var headers;
+      if (responseHeaders) {
+        headers = getResponseHeadersList(x, responseHeaders);
+      }
+
       if (noMetadata) {
         observer.onNext(blob);
       } else {
-        observer.onNext({ blob, size, duration });
+        observer.onNext({ blob, size, duration, headers });
       }
 
       observer.onCompleted();
