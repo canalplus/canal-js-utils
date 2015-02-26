@@ -24,8 +24,14 @@ function indexOf(arr, value) {
 }
 
 function groupBy(arr, prop) {
+  var fn;
+  if (isFunction(prop))
+    fn = prop;
+  else
+    fn = (v) => v[prop];
+
   return reduce(arr, (result, val) => {
-    var key = val[prop];
+    var key = fn(val);
     (isArray(result[key])
       ? result[key]
       : result[key] = []).push(val);
