@@ -98,11 +98,11 @@ function flatten(arr, fn) {
 }
 
 function isDate(value) {
-  return value && typeof value == "object" && toString.call(value) == "[object Date]" || false;
+  return !!value && typeof value == "object" && toString.call(value) == "[object Date]" || false;
 }
 
 function isFunction(value) {
-  return value && typeof value == "function" || false;
+  return !!value && typeof value == "function" || false;
 }
 
 function isNumber(value) {
@@ -110,11 +110,19 @@ function isNumber(value) {
 }
 
 function isObject(value) {
-  return value && typeof value == "object" || false;
+  return !!value && typeof value == "object" || false;
 }
 
 function isString(value) {
   return typeof value == "string";
+}
+
+function isPromise(value) {
+  return !!value && typeof value.then == "function";
+}
+
+function isObservable(value) {
+  return !!value && typeof value.subscribe == "function";
 }
 
 function identity(x) {
@@ -311,6 +319,8 @@ module.exports = {
   isNumber,
   isObject,
   isString,
+  isPromise,
+  isObservable,
   keys,
   last,
   map,
