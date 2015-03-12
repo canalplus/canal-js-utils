@@ -190,11 +190,16 @@ function guidToUuid(uuid) {
   assert.equal(uuid.length, 16, "UUID length should be 16");
   var buf = strToBytes(uuid);
 
-  var [p1A, p1B, p1C, p1D] = buf.subarray( 0,  4);
-  var [p2A, p2B]           = buf.subarray( 4,  6);
-  var [p3A, p3B]           = buf.subarray( 6,  8);
-  var p4                   = buf.subarray( 8, 10);
-  var p5                   = buf.subarray(10, 16);
+  var p1A = buf[0];
+  var p1B = buf[1];
+  var p1C = buf[2];
+  var p1D = buf[3];
+  var p2A = buf[4];
+  var p2B = buf[5];
+  var p3A = buf[6];
+  var p3B = buf[7];
+  var p4 = buf.subarray( 8, 10);
+  var p5 = buf.subarray(10, 16);
 
   var ord = new Uint8Array(16);
   ord[0] = p1D; ord[1] = p1C; ord[2] = p1B; ord[3] = p1A; // swap32 BE -> LE

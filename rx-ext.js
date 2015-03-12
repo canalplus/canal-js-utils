@@ -1,6 +1,6 @@
 var Promise_ = require("es6-promise").Promise;
 var { Observable, SingleAssignmentDisposable, config } = require("rx/dist/rx.lite.js");
-var { fromEvent, merge } = Observable;
+var { fromEvent, merge, timer } = Observable;
 var { getBackedoffDelay } = require("./backoff");
 var { identity, isArray, map, noop } = require("./misc");
 var debounce = require("./debounce");
@@ -48,8 +48,14 @@ observableProto.customDebounce = function(time, debounceOptions) {
   });
 };
 
-function retryWithBackoff(fn, { retryDelay, totalRetry, shouldRetry }) {
+function retryWithBackoff(fn, { retryDelay, totalRetry, shouldRetry, resetDelay }) {
   var retryCount = 0;
+  var debounceRetryCount;
+  if (resetDelay > 0) {
+    debounceRetryCount = debounce(() => retryCount = 0, resetDelay);
+  } else {
+    debounceRetryCount = noop;
+  }
 
   return function doRetry() {
     // do not leak arguments
@@ -58,13 +64,15 @@ function retryWithBackoff(fn, { retryDelay, totalRetry, shouldRetry }) {
 
     return fn.apply(null, args).catch(err => {
       var wantRetry = !shouldRetry || shouldRetry(err);
-      if (wantRetry && retryCount++ < totalRetry) {
-        var fuzzedDelay = getBackedoffDelay(retryDelay, retryCount);
-        return Observable.timer(fuzzedDelay).flatMap(() => doRetry.apply(null, args));
-      }
-      else {
+      if (!wantRetry || retryCount++ >= totalRetry) {
         throw err;
       }
+
+      var fuzzedDelay = getBackedoffDelay(retryDelay, retryCount);
+      return timer(fuzzedDelay).flatMap(() => {
+        debounceRetryCount();
+        return doRetry.apply(null, args);
+      });
     });
   };
 }
