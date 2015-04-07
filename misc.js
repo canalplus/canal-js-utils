@@ -64,6 +64,17 @@ function find(arr, fn) {
   }
 }
 
+function between(arr, f, v) {
+  var i = -1;
+  var l = arr ? arr.length : 0;
+  while (++i < l) {
+    if (arr[i][f] <= v &&
+        arr[i+1]       &&
+        v < arr[i+1][f])
+      return arr[i];
+  }
+}
+
 function findLast(arr, fn) {
   var i = arr ? arr.length : 0;
   while (--i >= 0) {
@@ -308,6 +319,7 @@ module.exports = {
   values,
   filter,
   find,
+  between,
   findLast,
   flatten,
   groupBy,
