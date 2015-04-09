@@ -63,7 +63,7 @@ function retryWithBackoff(fn, { retryDelay, totalRetry, shouldRetry, resetDelay 
       args[i] = arguments[i];
 
     return fn.apply(null, args).catch(err => {
-      var wantRetry = !shouldRetry || shouldRetry(err);
+      var wantRetry = !shouldRetry || shouldRetry(err, retryCount);
       if (!wantRetry || retryCount++ >= totalRetry) {
         throw err;
       }

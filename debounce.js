@@ -26,7 +26,9 @@ module.exports = function(fn, wait, debounceOptions) {
 
   function debounced() {
     // do not leak arguments object to prevent de-optimizations
-    args = cloneArray(arguments);
+    var l = arguments.length, i = 0;
+    args = Array(l);
+    for (; i < l; i++) args[i] = arguments[i];
 
     if (leading && !calledOnce) {
       calledOnce = true;
