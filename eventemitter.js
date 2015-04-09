@@ -31,9 +31,11 @@ EventEmitter.prototype.trigger = function(evt, arg) {
   if (!this.__listeners.hasOwnProperty(evt)) return;
   var listeners = this.__listeners[evt].slice();
   _.each(listeners, listener => {
-    var err = _.tryCatch(() => listener(arg));
-    if (err instanceof Error)
+    try {
+      listener(arg);
+    } catch(e) {
       console.error(err, err.stack);
+    }
   });
 };
 
