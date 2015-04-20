@@ -13,13 +13,13 @@ function RequestError(url, xhr, message, reason = null) {
 }
 RequestError.prototype = new Error();
 
-function RestCallMethodError(url, restCallStatus) {
+function RestCallMethodError(url, { code, method, message }) {
   this.name = "RestCallMethodError";
   this.url = url;
-  this.restCallStatus = restCallStatus;
-  this.message = "restmethodcall: webservice error status " + restCallStatus + " (" + url + ")";
+  this.code = code;
+  this.message = `restmethodcall: webservice error status ${code} (${url})${method ? " (" + method + ")" : ""}${message ? "\n" + message : ""}`;
   if (Error.captureStackTrace) {
-    Error.captureStackTrace(this, RequestError);
+    Error.captureStackTrace(this, RestCallMethodError);
   }
 }
 RestCallMethodError.prototype = new Error();
@@ -195,7 +195,7 @@ function restCallMethod(options) {
       var restCallResult = response.querySelector("RestCallResult");
       var status = +restCallResult.querySelector("Status").textContent;
       if (status < 0)
-        throw new RestCallMethodError(options.url, status);
+        throw new RestCallMethodError(options.url, { code: status, method: options.ScriptInfo });
       else
         return {
           output: restCallResult.querySelector("Output"),
