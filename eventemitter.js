@@ -34,7 +34,7 @@ EventEmitter.prototype.trigger = function(evt, arg) {
     try {
       listener(arg);
     } catch(e) {
-      console.error(err, err.stack);
+      console.error(e, e.stack);
     }
   });
 };
