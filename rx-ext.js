@@ -48,6 +48,28 @@ observableProto.customDebounce = function(time, debounceOptions) {
   });
 };
 
+observableProto.simpleTimeout = function(time, errMessage="timeout") {
+  var source = this;
+  return Observable.create(observer => {
+    var sad = new SingleAssignmentDisposable();
+    var timer = setTimeout(() => observer.onError(new Error(errMessage)), time);
+
+    sad.setDisposable(
+      source.subscribe(
+        x => {
+          clearTimeout(timer);
+          observer.onNext(x);
+        },
+        e => observer.onError(e),
+        _ => observer.onCompleted()));
+
+    return () => {
+      clearTimeout(timer);
+      sad.dispose();
+    };
+  });
+};
+
 function retryWithBackoff(fn, { retryDelay, totalRetry, shouldRetry, resetDelay }) {
   var retryCount = 0;
   var debounceRetryCount;
