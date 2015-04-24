@@ -307,6 +307,15 @@ function chunk(arr, size) {
   return r;
 }
 
+function pad(n, l) {
+  n = n.toString();
+  if (n.length >= l) {
+    return n;
+  }
+  var arr = new Array(l + 1).join('0') + n;
+  return arr.slice(-l);
+}
+
 module.exports = {
   chunk,
   compact,
@@ -338,6 +347,7 @@ module.exports = {
   map,
   memoize,
   noop,
+  pad,
   pick,
   pluck,
   reduce,
