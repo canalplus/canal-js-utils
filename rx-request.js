@@ -24,6 +24,18 @@ function RestCallMethodError(url, { code, method, message }) {
 }
 RestCallMethodError.prototype = new Error();
 
+function RestCallResult(response) {
+  var restCallResult = response.querySelector("RestCallResult");
+  var status = +restCallResult.querySelector("Status").textContent;
+  if (status < 0)
+    throw new RestCallMethodError(options.url, { code: status, method: options.ScriptInfo });
+  else
+    return {
+      output: restCallResult.querySelector("Output"),
+      status: status,
+    };
+}
+
 function toJSONForIE(blob) {
   try {
     return JSON.parse(blob);
@@ -191,22 +203,13 @@ function restCallMethod(options) {
   // options.format = "json";
   options.noMetadata = true;
   return request(options)
-    .map((response) => {
-      var restCallResult = response.querySelector("RestCallResult");
-      var status = +restCallResult.querySelector("Status").textContent;
-      if (status < 0)
-        throw new RestCallMethodError(options.url, { code: status, method: options.ScriptInfo });
-      else
-        return {
-          output: restCallResult.querySelector("Output"),
-          status: status,
-        };
-    });
+    .map(RestCallResult);
 }
 
 request.escapeXml = escapeXml;
 request.RequestError = RequestError;
 request.RestCallMethodError = RestCallMethodError;
+request.RestCallResult = RestCallResult;
 request.getNodeTextContent = getNodeTextContent;
 
 module.exports = request;
