@@ -24,11 +24,11 @@ function RestCallMethodError(url, { code, method, message }) {
 }
 RestCallMethodError.prototype = new Error();
 
-function RestCallResult(response) {
+function RestCallResult(response, url, scriptInfo) {
   var restCallResult = response.querySelector("RestCallResult");
   var status = +restCallResult.querySelector("Status").textContent;
   if (status < 0)
-    throw new RestCallMethodError(options.url, { code: status, method: options.ScriptInfo });
+    throw new RestCallMethodError(url, { code: status, method: scriptInfo });
   else
     return {
       output: restCallResult.querySelector("Output"),
@@ -203,7 +203,7 @@ function restCallMethod(options) {
   // options.format = "json";
   options.noMetadata = true;
   return request(options)
-    .map(RestCallResult);
+    .map((data) => RestCallResult(data, options.url, options.ScriptInfo));
 }
 
 request.escapeXml = escapeXml;
