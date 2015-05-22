@@ -138,7 +138,14 @@ function request(options) {
       if (noMetadata) {
         observer.onNext(blob);
       } else {
-        observer.onNext({ blob, size, duration, headers });
+        var responseUrl = x.responseUrl || url;
+        observer.onNext({
+          blob,
+          size,
+          duration,
+          headers,
+          url: responseUrl
+        });
       }
 
       observer.onCompleted();
