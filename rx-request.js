@@ -76,8 +76,8 @@ function request(options) {
       data,
       headers,
       format,
-      noMetadata,
-      responseHeaders
+      withMetadata,
+      responseHeaders,
     } = options;
 
     var xhr = new XMLHttpRequest();
@@ -113,7 +113,6 @@ function request(options) {
       }
 
       var duration = Date.now() - sent;
-      var size = evt.total;
       var blob;
       if (format == "document") {
         blob = new DOMParser().parseFromString(x.responseText, "text/xml");
@@ -130,22 +129,27 @@ function request(options) {
           `null response with format "${format}" (error while parsing or wrong content-type)`));
       }
 
-      var headers;
-      if (responseHeaders) {
-        headers = getResponseHeadersList(x, responseHeaders);
-      }
+      // TODO(pierre): find a better API than this "withMetadata" flag
+      // (it is weird and collisions with responseHeaders)
+      if (withMetadata) {
+        var headers;
+        if (responseHeaders) {
+          headers = getResponseHeadersList(x, responseHeaders);
+        }
 
-      if (noMetadata) {
-        observer.onNext(blob);
-      } else {
-        var responseUrl = x.responseUrl || url;
+        var size = evt.total;
+
         observer.onNext({
           blob,
           size,
           duration,
           headers,
-          url: responseUrl
+          url: x.responseURL || url,
+          xhr: x,
         });
+      }
+      else {
+        observer.onNext(blob);
       }
 
       observer.onCompleted();
@@ -208,7 +212,6 @@ function restCallMethod(options) {
   // options.headers = { "Content-Type": "application/json" };
   // options.data = JSON.stringify(options.data);
   // options.format = "json";
-  options.noMetadata = true;
   return request(options)
     .map((data) => RestCallResult(data, options.url, options.ScriptInfo));
 }
