@@ -56,6 +56,34 @@ function sortedIndex(arr, value, fn) {
   return low;
 }
 
+function sortedMerge(arr1, arr2, sortValue) {
+  var i = 0, j = 0, k = 0, p;
+  var m = arr1.length, n = arr2.length;
+  var arr = [];
+
+  while (i < m && j < n) {
+    if (arr1[i][sortValue] <= arr2[j][sortValue]) {
+      arr[k] = arr1[i]; i++; k++;
+    } else if (k > 0 && arr2[j][sortValue] <= arr[k - 1][sortValue]){
+      j++;
+    } else {
+      arr[k] = arr2[j]; j++; k++;
+    }
+  }
+
+  if (i < m) {
+    for (p = i; p < m; p++) {
+      arr[k] = arr1[p]; k++;
+    }
+  } else {
+    for (p = j; p < n; p++) {
+      arr[k] = arr2[p]; k++;
+    }
+  }
+
+  return arr;
+}
+
 function find(arr, fn) {
   var i = -1;
   var l = arr ? arr.length : 0;
@@ -353,6 +381,7 @@ module.exports = {
   reduce,
   simpleMerge,
   sortedIndex,
+  sortedMerge,
   tryCatch,
   uniqueId,
 };
