@@ -1,2 +1,2 @@
 require("./rx-ext");
-module.exports = require("rx/dist/rx.lite.js");
+module.exports = require("./rx-lite.js");
