@@ -1,0 +1,15 @@
+{
+  "unused": true,
+  "esnext": true,
+  "laxbreak": true,
+  "eqnull": true,
+  "undef": true,
+  "browser": true,
+  "devel": true,
+  "trailing": true,
+  "mocha": true,
+  "strict": false,
+  "predef": [
+    "require", "module", "__DEV__"
+  ]
+}
