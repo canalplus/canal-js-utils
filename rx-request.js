@@ -115,7 +115,7 @@ function request(options) {
       var duration = Date.now() - sent;
       var blob;
       if (format == "document") {
-        blob = new DOMParser().parseFromString(x.responseText, "text/xml");
+        blob = new window.DOMParser().parseFromString(x.responseText, "text/xml");
       } else {
         blob = x.response;
       }
