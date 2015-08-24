@@ -1,4 +1,4 @@
-// v3.1.0
+// v3.1.1
 //
 // Copyright (c) Microsoft Open Technologies, Inc. All rights reserved. See License.txt in the project root for license information.
 
@@ -3078,6 +3078,9 @@ observableProto.zip = function () {
 Observable.zip = function () {
   var len = arguments.length, args = new Array(len);
   for(var i = 0; i < len; i++) { args[i] = arguments[i]; }
+  if (Array.isArray(args[0])) {
+    args = isFunction(args[1]) ? args[0].concat(args[1]) : args[0];
+  }
   var first = args.shift();
   return first.zip.apply(first, args);
 };
