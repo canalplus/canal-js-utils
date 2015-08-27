@@ -2,7 +2,7 @@
 //
 // Copyright (c) Microsoft Open Technologies, Inc. All rights reserved. See License.txt in the project root for license information.
 
-var root = window;
+var root = global;
 
 var Rx = {
   internals: {},
@@ -798,7 +798,7 @@ var localSetTimeout = localTimer.setTimeout,
       .replace(/toString| for [^\]]+/g, '.*?') + '$'
   );
 
-  var setImmediate = window.setImmediate;
+  var setImmediate = global.setImmediate;
 
   function postMessageSupported () {
     // Ensure not in a worker
@@ -4022,32 +4022,24 @@ ListenDisposable.prototype.dispose = function () {
 };
 
 function createEventListener (el, eventName, handler) {
-  var disposables = new CompositeDisposable();
-
   // Asume NodeList or HTMLCollection
   var elemToString = Object.prototype.toString.call(el);
   if (elemToString === '[object NodeList]' || elemToString === '[object HTMLCollection]') {
+    var disposables = new CompositeDisposable();
     for (var i = 0, len = el.length; i < len; i++) {
       disposables.add(createEventListener(el.item(i), eventName, handler));
     }
-  } else if (el) {
-    disposables.add(new ListenDisposable(el, eventName, handler));
+    return disposables;
   }
 
-  return disposables;
+  return new ListenDisposable(el, eventName, handler);
 }
-
-/**
- * Configuration option to determine whether to use native events only
- */
-Rx.config.useNativeEvents = false;
 
 function eventHandler(o, selector) {
   return function handler () {
     var results = arguments[0];
     if (isFunction(selector)) {
-      results = tryCatch(selector).apply(null, arguments);
-      if (results === errorObj) { return o.onError(results.e); }
+      results = selector.apply(null, arguments);
     }
     o.onNext(results);
   };
@@ -4067,17 +4059,6 @@ Observable.fromEvent = function (element, eventName, selector) {
       function (h) { element.addListener(eventName, h); },
       function (h) { element.removeListener(eventName, h); },
       selector);
-  }
-
-  // Use only if non-native events are allowed
-  if (!Rx.config.useNativeEvents) {
-    // Handles jq, Angular.js, Zepto, Marionette, Ember.js
-    if (typeof element.on === 'function' && typeof element.off === 'function') {
-      return fromEventPattern(
-        function (h) { element.on(eventName, h); },
-        function (h) { element.off(eventName, h); },
-        selector);
-    }
   }
 
   return new AnonymousObservable(function (o) {
