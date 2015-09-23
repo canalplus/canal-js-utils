@@ -1,43 +1,55 @@
-var _ = require("./misc");
+var schemeRe = /^(?:[a-z]+:)?\/\//i;
+var selfDirRe = /\/[\.]{1,2}\//;
 
-var schemeRe = /:\/\//;
-var uniqSchemeRe = /:\//;
-var selfDirRe = /\/\.\//g;
-var prevDirRe = /\/\.\.\//;
-var rmPrevDirRe = /[^\/]*\/+\.\.\//;
-var slashesRe = /\/+/g;
-
-function _joinUrl(base, part) {
-  if (part.length === 0) return base;
-  if (schemeRe.test(part)) {
-    return part;
-  } else {
-    return base + "/" + part;
+function _normalizeUrl(url) {
+  // fast path if no ./ or ../ are present in the url
+  if (!selfDirRe.test(url)) {
+    return url;
   }
-}
 
-function _normalizeUrl(str) {
-  // remove ./ parts
-  if (selfDirRe.test(str))
-    str = str.replace(selfDirRe, "/");
+  var newUrl = [];
+  var oldUrl = url.split("/");
+  for (var i = 0, l = oldUrl.length; i < l; i++) {
+    if (oldUrl[i] == "..") {
+      newUrl.pop();
+    } else if (oldUrl[i] == ".") {
+      continue;
+    } else {
+      newUrl.push(oldUrl[i]);
+    }
+  }
 
-  // remove foo/../ parts
-  while(prevDirRe.test(str))
-    str = str.replace(rmPrevDirRe, "/");
-
-  // join multiple / except the scheme one
-  return str
-    .replace(slashesRe, "/")
-    .replace(uniqSchemeRe, "://");
+  return newUrl.join("/");
 }
 
 function resolveURL() {
-  var args = _.compact(arguments);
-  var len = args.length;
+  var len = arguments.length;
   if (len === 0)
     return "";
-  else
-    return _normalizeUrl(_.reduce(args, _joinUrl, ""));
+
+  var base = "";
+  for (var i = 0; i < len; i++) {
+    var part = arguments[i];
+    if (typeof part !== "string" || part === "") {
+      continue;
+    }
+    if (schemeRe.test(part)) {
+      base = part;
+    }
+    else {
+      if (part[0] === "/") {
+        part = part.substr(1);
+      }
+
+      if (base[base.length - 1] === "/") {
+        base = base.substr(0, base.length - 1);
+      }
+
+      base = base + "/" + part;
+    }
+  }
+
+  return _normalizeUrl(base);
 }
 
 function parseBaseURL(url) {
@@ -49,4 +61,7 @@ function parseBaseURL(url) {
   }
 }
 
-module.exports = { resolveURL, parseBaseURL };
+module.exports = {
+  resolveURL,
+  parseBaseURL,
+};
