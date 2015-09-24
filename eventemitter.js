@@ -1,4 +1,3 @@
-var _ = require("./misc");
 var assert = require("./assert");
 
 function EventEmitter() {
@@ -30,7 +29,7 @@ EventEmitter.prototype.removeEventListener = function(evt, fn) {
 EventEmitter.prototype.trigger = function(evt, arg) {
   if (!this.__listeners.hasOwnProperty(evt)) return;
   var listeners = this.__listeners[evt].slice();
-  _.each(listeners, listener => {
+  listeners.forEach((listener) => {
     try {
       listener(arg);
     } catch(e) {
