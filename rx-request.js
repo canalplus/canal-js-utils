@@ -109,7 +109,7 @@ function request(options) {
       var x = evt.target;
       var s = x.status;
       if (s < 200 || s >= 300) {
-        return observer.onError(new RequestError(url, x, x.statusText));
+        return observer.error(new RequestError(url, x, x.statusText));
       }
 
       var duration = Date.now() - sent;
@@ -125,7 +125,7 @@ function request(options) {
       }
 
       if (blob == null) {
-        return observer.onError(new RequestError(url, x,
+        return observer.error(new RequestError(url, x,
           `null response with format "${format}" (error while parsing or wrong content-type)`));
       }
 
@@ -139,7 +139,7 @@ function request(options) {
 
         var size = evt.total;
 
-        observer.onNext({
+        observer.next({
           blob,
           size,
           duration,
@@ -149,14 +149,14 @@ function request(options) {
         });
       }
       else {
-        observer.onNext(blob);
+        observer.next(blob);
       }
 
-      observer.onCompleted();
+      observer.complete();
     }
 
     function onError(e) {
-      observer.onError(new RequestError(url, e, "error event"));
+      observer.error(new RequestError(url, e, "error event"));
     }
 
     return () => {

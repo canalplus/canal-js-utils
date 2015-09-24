@@ -1,72 +1,50 @@
-var { Observable, SingleAssignmentDisposable, config } = require("./rx-lite.js");
+var { Observable } = require("./rx-lite.js");
 var { fromEvent, merge, timer } = Observable;
 var { getBackedoffDelay } = require("./backoff");
 var { identity, isArray, map, noop } = require("./misc");
+var log = require("./log");
 var debounce = require("./debounce");
 
-config.useNativeEvents = true;
-
 var observableProto = Observable.prototype;
-
-if (__DEV__) {
-  observableProto.log = function(ns, fn) {
-    if (!ns) ns = "";
-    return this.do(
-      x  => console.log(ns, "next",  (fn || identity)(x)),
-      e  => console.log(ns, "error", e),
-      () => console.log(ns, "completed")
-    );
-  };
-} else {
-  observableProto.log = function() { return this; };
-}
 
 observableProto.each = function(onNext) {
   return this.subscribe(onNext, noop);
 };
 
+observableProto.pluck = function(key) {
+  return this.map(v => v[key]);
+};
+
 var simpleEquals = (a, b) => a === b;
-observableProto.changes = function(keySelector) {
-  return this.distinctUntilChanged(keySelector, simpleEquals);
+observableProto.changes = function() {
+  return this.distinctUntilChanged(simpleEquals);
 };
 
 observableProto.customDebounce = function(time, debounceOptions) {
   var source = this;
   return Observable.create(observer => {
-    var debounced = debounce(val => observer.onNext(val), time, debounceOptions);
+    var debounced = debounce(val => observer.next(val), time, debounceOptions);
     var subscribe = source.subscribe(
       debounced,
-      e  => observer.onError(e),
-      () => observer.onCompleted()
+      e  => observer.error(e),
+      () => observer.complete()
     );
     return () => {
       debounced.dispose();
-      subscribe.dispose();
+      subscribe.unsubscribe();
     };
   });
 };
 
-observableProto.simpleTimeout = function(time, errMessage="timeout") {
-  var source = this;
-  return Observable.create(observer => {
-    var sad = new SingleAssignmentDisposable();
-    var timer = setTimeout(() => observer.onError(new Error(errMessage)), time);
-
-    sad.setDisposable(
-      source.subscribe(
-        x => {
-          clearTimeout(timer);
-          observer.onNext(x);
-        },
-        e => observer.onError(e),
-        _ => observer.onCompleted()));
-
-    return () => {
-      clearTimeout(timer);
-      sad.dispose();
-    };
-  });
+observableProto.log = function(ns, fn) {
+  if (!ns) ns = "";
+  return this.do(
+    x  => log.debug(ns, "next",  (fn || identity)(x)),
+    e  => log.debug(ns, "error", e),
+    () => log.debug(ns, "completed")
+  );
 };
+
 
 function retryWithBackoff(fn, { retryDelay, totalRetry, shouldRetry, resetDelay }) {
   var retryCount = 0;
@@ -97,19 +75,25 @@ function retryWithBackoff(fn, { retryDelay, totalRetry, shouldRetry, resetDelay 
   };
 }
 
+function on(elt, evts) {
+  if (isArray(evts)) {
+    return merge.apply(null, map(evts, evt => fromEvent(elt, evt)));
+  } else {
+    return fromEvent(elt, evts);
+  }
+}
+
+function first(obs) {
+  return obs.take(1);
+}
+
+function only(x) {
+  return Observable.never().startWith(x);
+}
+
 module.exports = {
-  on(elt, evts) {
-    if (isArray(evts)) {
-      return merge(map(evts, evt => fromEvent(elt, evt)));
-    } else {
-      return fromEvent(elt, evts);
-    }
-  },
-  first(obs) {
-    return obs.take(1);
-  },
-  only(x) {
-    return Observable.never().startWith(x);
-  },
+  on,
+  first,
+  only,
   retryWithBackoff,
 };

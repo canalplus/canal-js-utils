@@ -1,6 +1,6 @@
 {
   "name": "canal-js-utils",
-  "version": "2.0.1",
+  "version": "3.0.0-rxnext",
   "description": "Various JS utility modules used in CANAL+",
   "main": "index.js",
   "repository": {
@@ -14,6 +14,6 @@
   },
   "homepage": "https://github.com/canalplus/canal-js-utils",
   "dependencies": {
-    "es6-promise": "2.0.1"
+    "es6-promise": "3.0.2"
   }
 }
