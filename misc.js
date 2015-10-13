@@ -117,9 +117,9 @@ function baseFlatten(arr, fromIndex) {
   while (++i < l) {
     var value = arr[i];
     if (value && typeof value == "object" && typeof value.length == "number") {
-      var valIndex = -1,
-          valLength = value.length,
-          resIndex = n.length;
+      var valIndex = -1;
+      var valLength = value.length;
+      var resIndex = n.length;
 
       n.length += valLength;
       while (++valIndex < valLength) {
@@ -340,7 +340,7 @@ function pad(n, l) {
   if (n.length >= l) {
     return n;
   }
-  var arr = new Array(l + 1).join('0') + n;
+  var arr = new Array(l + 1).join("0") + n;
   return arr.slice(-l);
 }
 

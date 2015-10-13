@@ -1,5 +1,3 @@
-var { cloneArray } = require("./misc");
-
 module.exports = function(fn, wait, debounceOptions) {
   var timer = null;
   var stamp = 0;

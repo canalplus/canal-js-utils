@@ -173,9 +173,9 @@ function request(options) {
 
 var ENTITIES_REG = /[&<>]/g;
 var ENTITIES = {
-  '&': '&amp;',
-  '<': '&lt;',
-  '>': '&gt;'
+  "&": "&amp;",
+  "<": "&lt;",
+  ">": "&gt;"
 };
 
 function escapeXml(xml) {
@@ -201,7 +201,7 @@ function getNodeTextContent(root, name) {
   return item && item.textContent;
 }
 
-var METHOD_CALL_XML = '<RestCallMethod xmlns:i="http://www.w3.org/2001/XMLSchema-instance">{payload}</RestCallMethod>';
+var METHOD_CALL_XML = "<RestCallMethod xmlns:i=\"http://www.w3.org/2001/XMLSchema-instance\">{payload}</RestCallMethod>";
 
 function restCallMethod(options) {
   options.method = "POST";
