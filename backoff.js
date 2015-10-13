@@ -1,4 +1,3 @@
-var { Observable } = require("canal-js-utils/rx");
 var FUZZ_FACTOR = 0.3;
 
 function getFuzzedDelay(retryDelay) {

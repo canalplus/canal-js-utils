@@ -3,11 +3,12 @@
 // Copyright (c) Microsoft Open Technologies, Inc. All rights reserved. See License.txt in the project root for license information.
 
 var root = global;
+var Promise_ = require("./promise");
 
 var Rx = {
   internals: {},
   config: {
-    Promise: root.Promise
+    Promise: Promise_
   },
   helpers: { }
 };
@@ -18,18 +19,17 @@ var noop = Rx.helpers.noop = function () { },
   defaultNow = Rx.helpers.defaultNow = Date.now,
   defaultComparer = Rx.helpers.defaultComparer = function (x, y) { return isEqual(x, y); },
   defaultSubComparer = Rx.helpers.defaultSubComparer = function (x, y) { return x > y ? 1 : (x < y ? -1 : 0); },
-  defaultKeySerializer = Rx.helpers.defaultKeySerializer = function (x) { return x.toString(); },
   defaultError = Rx.helpers.defaultError = function (err) { throw err; },
   isPromise = Rx.helpers.isPromise = function (p) { return !!p && typeof p.subscribe !== 'function' && typeof p.then === 'function'; },
   isFunction = Rx.helpers.isFunction = function (value) {
     return typeof value == 'function' || false;
   };
 
-  function cloneArray(arr) {
-    var len = arr.length, a = new Array(len);
-    for(var i = 0; i < len; i++) { a[i] = arr[i]; }
-    return a;
-  }
+function cloneArray(arr) {
+  var len = arr.length, a = new Array(len);
+  for(var i = 0; i < len; i++) { a[i] = arr[i]; }
+  return a;
+}
 
 var errorObj = {e: {}};
 var tryCatchTarget;
