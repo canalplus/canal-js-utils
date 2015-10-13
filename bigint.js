@@ -24,7 +24,7 @@ function multiplyByNumber(num, x, base) {
 
   var result = [];
   var power = x;
-  while (true) {
+  for(;;) {
     if (num & 1) {
       result = add(result, power, base);
     }
@@ -37,7 +37,7 @@ function multiplyByNumber(num, x, base) {
 }
 
 function parseToDigitsArray(str, base) {
-  var digits = str.split('');
+  var digits = str.split("");
   var ary = [];
   for (var i = digits.length - 1; i >= 0; i--) {
     var n = parseInt(digits[i], base);
@@ -61,9 +61,9 @@ function convertBase(str, fromBase, toBase) {
     power = multiplyByNumber(fromBase, power, toBase);
   }
 
-  var out = '';
-  for (var i = outArray.length - 1; i >= 0; i--) {
-    out += outArray[i].toString(toBase);
+  var out = "";
+  for (var j = outArray.length - 1; j >= 0; j--) {
+    out += outArray[j].toString(toBase);
   }
   return out;
 }
@@ -71,11 +71,11 @@ function convertBase(str, fromBase, toBase) {
 
 function decToHex(decStr) {
   var hex = convertBase(decStr, 10, 16);
-  return hex ? '0x' + hex : null;
+  return hex ? "0x" + hex : null;
 }
 
 function hexToDec(hexStr) {
-  if (hexStr.substring(0, 2) === '0x') hexStr = hexStr.substring(2);
+  if (hexStr.substring(0, 2) === "0x") hexStr = hexStr.substring(2);
   hexStr = hexStr.toLowerCase();
   return convertBase(hexStr, 16, 10);
 }
