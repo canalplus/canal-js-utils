@@ -201,12 +201,16 @@ function getNodeTextContent(root, name) {
   return item && item.textContent;
 }
 
-var METHOD_CALL_XML = "<RestCallMethod xmlns:i=\"http://www.w3.org/2001/XMLSchema-instance\">{payload}</RestCallMethod>";
+var METHOD_CALL_XML = {
+  "v1": "<RestCallMethod xmlns:i=\"http://www.w3.org/2001/XMLSchema-instance\">{payload}</RestCallMethod>",
+  "v2": "<ServiceRequest><TechnicalField></TechnicalField>{payload}</ServiceRequest>"
+};
 
 function restCallMethod(options) {
+  var payloadVersion = options.version || "v1";
   options.method = "POST";
   options.headers = { "Content-Type": "application/xml" };
-  options.data = METHOD_CALL_XML.replace("{payload}", objToXML(options.data));
+  options.data = METHOD_CALL_XML[payloadVersion].replace("{payload}", objToXML(options.data));
   options.format = "document";
   // options.url = options.url.replace("RestPortalProvider", "JsonPortalProvider");
   // options.headers = { "Content-Type": "application/json" };
