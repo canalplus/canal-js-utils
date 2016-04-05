@@ -24,14 +24,24 @@ function RestCallMethodError(url, { code, method, message }) {
 }
 RestCallMethodError.prototype = new Error();
 
-function RestCallResult(response, url, scriptInfo) {
-  var restCallResult = response.querySelector("RestCallResult");
+const REST_CALL_RESULT = {
+  "v1": "RestCallResult",
+  "v2": "ServiceResponse"
+};
+
+const REST_CALL_OUTPUT = {
+  "v1": "Output",
+  "v2": "OutData"
+};
+
+function RestCallResult(response, url, scriptInfo, version) {
+  var restCallResult = response.querySelector(REST_CALL_RESULT[version]);
   var status = +restCallResult.querySelector("Status").textContent;
   if (status < 0)
     throw new RestCallMethodError(url, { code: status, method: scriptInfo });
   else
     return {
-      output: restCallResult.querySelector("Output"),
+      output: restCallResult.querySelector(REST_CALL_OUTPUT[version]),
       status: status,
     };
 }
@@ -201,7 +211,7 @@ function getNodeTextContent(root, name) {
   return item && item.textContent;
 }
 
-var METHOD_CALL_XML = {
+var REST_CALL_XML = {
   "v1": "<RestCallMethod xmlns:i=\"http://www.w3.org/2001/XMLSchema-instance\">{payload}</RestCallMethod>",
   "v2": "<ServiceRequest><TechnicalField></TechnicalField>{payload}</ServiceRequest>"
 };
@@ -210,14 +220,14 @@ function restCallMethod(options) {
   var payloadVersion = options.version || "v1";
   options.method = "POST";
   options.headers = { "Content-Type": "application/xml" };
-  options.data = METHOD_CALL_XML[payloadVersion].replace("{payload}", objToXML(options.data));
+  options.data = REST_CALL_XML[payloadVersion].replace("{payload}", objToXML(options.data));
   options.format = "document";
   // options.url = options.url.replace("RestPortalProvider", "JsonPortalProvider");
   // options.headers = { "Content-Type": "application/json" };
   // options.data = JSON.stringify(options.data);
   // options.format = "json";
   return request(options)
-    .map((data) => RestCallResult(data, options.url, options.ScriptInfo));
+    .map((data) => RestCallResult(data, options.url, options.ScriptInfo, payloadVersion));
 }
 
 request.escapeXml = escapeXml;
